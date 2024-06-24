@@ -1,15 +1,35 @@
-# neocities-bun
+# neocities-sync
 
-To install dependencies:
+Sync a directory to neocities.
+
+For every file inside a directory, upload them to neocities only if they have been
+modified. Delete files which exist on neocities but not locally.
+
+Creates a `.sync` file to store SHA1 hashes of files. If you get a out-of-sync error,
+delete this file, and the hashes will be fetched from neocities.
+
+## Installation
+
+No need to install, just run
 
 ```bash
-bun install
+bunx github:aspizu/neocities-sync
 ```
 
-To run:
+## Usage
 
 ```bash
-bun run index.ts
+neocities-sync --help
 ```
 
-This project was created using `bun init` in bun v1.1.13. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+## Development
+
+```bash
+git clone https://github.com/aspizu/neocities-sync
+cd neocities-sync
+bun run src/index.ts
+```
+
+## Contributing
+
+Pull requests are welcome.
