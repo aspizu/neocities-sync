@@ -2,6 +2,7 @@
 import {Glob, SHA1} from "bun"
 import Path from "node:path"
 import FS from "node:fs/promises"
+import packagejson from "../package.json"
 import {
 	DeleteResult,
 	ListError,
@@ -62,9 +63,12 @@ enum SyncResult {
 async function sync(
 	neocities: Neocities,
 	path: string,
-	statePath: string,
+	statePath: string | undefined,
 	ignoreDisallowedFileTypes: boolean,
 ): Promise<SyncResult> {
+	if (!statePath) {
+		statePath = Path.join(path, ".state")
+	}
 	let currentState = await readStateFile(statePath)
 	if (currentState === undefined) {
 		const fetchStateResult = await fetchState(neocities)
@@ -117,11 +121,12 @@ async function sync(
 
 program
 	.name("neocities-sync")
-	.description("Sync a directory with Neocities")
+	.version(packagejson.version)
+	.description("Sync files to neocities while doing the least amount of API requests.")
 	.requiredOption("--username <USERNAME>", "Neocities username.")
 	.requiredOption("--password <PASSWORD>", "Neocities password.")
 	.requiredOption("--path <PATH>", "Path to sync.")
-	.option("--state <STATE>", "Path to state file.", ".state")
+	.option("--state <STATE>", "Path to state file. (default: <PATH>/.state)")
 	.option("--ignore-disallowed-file-types", "Ignore disallowed file types.", false)
 	.parse()
 
@@ -148,14 +153,16 @@ switch (syncResult) {
 		console.log("Synced.")
 		break
 	case SyncResult.OUT_OF_SYNC:
-		console.warn("Out of sync, remove state file to fix.")
+		console.warn(
+			"Out of sync, this happened because your local state file contains file names which do not exist on neocities. To fix this, delete your state file and re-run neocities-sync.",
+		)
 		break
 	case SyncResult.INVALID_FILE_TYPE:
 		console.error("Invalid file type, use --ignore-disallowed-file-types to ignore.")
 		process.exit(1)
 		break
 	case SyncResult.INVALID_AUTH:
-		console.error("Invalid auth.")
+		console.error("Username or password is incorrect.")
 		process.exit(1)
 		break
 	case SyncResult.NETWORK_ERROR:
