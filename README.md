@@ -48,6 +48,17 @@ neocities-sync --username foo --password bar --path dist --ignore-disallowed-fil
 Here, we use `--state .state` to store the state outside the `dist` directory because
 it will be emptied on every build.
 
+## User Interface
+
+The shell script `neocities-sync.sh` provides a basic user interface using
+zenity.
+
+```bash
+./neocities-sync.sh
+```
+
+![Username and password dialog.](/assets/screenshot.png)
+
 ## Development
 
 ```bash
