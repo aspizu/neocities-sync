@@ -30,7 +30,7 @@ bunx github:aspizu/neocities-sync
 ```
 Usage: neocities-sync [options]
 
-Sync files to neocities while doing the least amount of API requests.
+Sync files to neocities while minimizing the number of API requests.
 
 Options:
   -V, --version                   output the version number
