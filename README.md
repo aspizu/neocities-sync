@@ -1,8 +1,16 @@
 # neocities-sync
 
-Sync files to neocities while doing the least amount of API requests.
+Sync files to neocities while minimizing the number of API requests.
 
-You can use this to deploy a Vite, Astro or Next.js app to neocities.
+[Vite]: https://vitejs.dev/
+[Astro]: https://astro.build/
+[Next.js]: https://nextjs.org/
+
+
+You can use this to deploy any project which builds as a static site. For example, you can deploy [Vite][], [Astro][], or [Next.js][] projects to neocities.
+
+[supporter]: https://neocities.org/supporter
+[file types]: https://neocities.org/site_files/allowed_types
 
 `neocities-sync` will:
 
@@ -10,7 +18,7 @@ You can use this to deploy a Vite, Astro or Next.js app to neocities.
 - Delete files which exist on neocities, but don't exist locally.
 - Store SHA1 hashes locally inside a `.state` file.
 - If the `.state` file doesn't exist, it will fetch all files from neocities and store them in the `.state` file.
-- If `--ignore-disallowed-file-types` is set, it will ignore disallowed file types. Use this if you are NOT a supporter.
+- If `--ignore-disallowed-file-types` is set, it will ignore disallowed [file types][]. Use this if you are NOT a paid [supporter][].
 
 ## Installation
 
@@ -27,7 +35,7 @@ bunx github:aspizu/neocities-sync
 ```
 Usage: neocities-sync [options]
 
-Sync files to neocities while doing the least amount of API requests.
+Sync files to neocities while minimizing the number of API requests.
 
 Options:
   -V, --version                   output the version number
