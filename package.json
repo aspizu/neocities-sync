@@ -14,5 +14,7 @@
 	"dependencies": {
 		"commander": "^12.1.0"
 	},
-	"bin": "./src/index.ts"
+	"bin": {
+		"neocities-sync": "src/index.ts"
+	}
 }

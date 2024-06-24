@@ -1,3 +1,4 @@
+#!/usr/bin/env bun
 import {Glob, SHA1} from "bun"
 import Path from "node:path"
 import FS from "node:fs/promises"
