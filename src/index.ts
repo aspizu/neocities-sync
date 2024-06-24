@@ -122,7 +122,7 @@ async function sync(
 program
 	.name("neocities-sync")
 	.version(packagejson.version)
-	.description("Sync files to neocities while doing the least amount of API requests.")
+	.description("Sync files to neocities while minimizing the number of API requests.")
 	.requiredOption("--username <USERNAME>", "Neocities username.")
 	.requiredOption("--password <PASSWORD>", "Neocities password.")
 	.requiredOption("--path <PATH>", "Path to sync.")
