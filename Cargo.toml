@@ -1,0 +1,30 @@
+[package]
+name = "neocities-sync"
+version = "1.0.0"
+description = "Sync files to neocities while doing the least amount of API requests."
+license = "MIT"
+documentation = "https://github.com/aspizu/neocities-sync"
+homepage = "https://github.com/aspizu/neocities-sync"
+repository = "https://github.com/aspizu/neocities-sync"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0.86"
+base64 = "0.22.1"
+clap = { version = "4.5.7", features = ["derive"] }
+colored = "2.1.0"
+futures = "0.3.30"
+fxhash = "0.2.1"
+glob = "0.3.1"
+inquire = "0.7.5"
+keyring = "2.3.3"
+pathdiff = "0.2.1"
+reqwest = { version = "0.12.5", features = ["json", "multipart"] }
+serde = { version = "1.0.203", features = ["derive"] }
+sha1 = "0.10.6"
+tokio = { version = "1.38.0", features = ["full"] }
+
+[profile.release]
+panic = "abort"
+lto = "thin"
+debug = true

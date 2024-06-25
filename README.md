@@ -1,4 +1,4 @@
-# neocities-sync
+# `neocities-sync`
 
 Sync files to [neocities](https://neocities.org/) while doing the least amount of
 [API](https://neocities.org/api) requests.
@@ -17,29 +17,48 @@ app to neocities.
 
 ## Installation
 
-Bun is required, install it from <https://bun.sh/>
-
-Just run:
-
 ```bash
-bunx github:aspizu/neocities-sync
+cargo install neocities-sync
 ```
 
 ## Usage
 
 ```
-Usage: neocities-sync [options]
+❯ neocities-sync --help
 
-Sync files to neocities while minimizing the number of API requests.
+|\---/|
+| x_x |   neocities-sync
+ \_-_/
+
+Sync files to neocities while doing the least amount of API requests.
+
+Usage: neocities-sync <COMMAND>
+
+Commands:
+  login   Login to neocities
+  logout  Logout from neocities
+  sync    Sync a directory to neocities
+  help    Print this message or the help of the given subcommand(s)
 
 Options:
-  -V, --version                   output the version number
-  --username <USERNAME>           Neocities username.
-  --password <PASSWORD>           Neocities password.
-  --path <PATH>                   Path to sync.
-  --state <STATE>                 Path to state file. (default: <PATH>/.state)
-  --ignore-disallowed-file-types  Ignore disallowed file types. (default: false)
-  -h, --help                      display help for command
+  -h, --help     Print help
+  -V, --version  Print version
+```
+
+```
+❯ neocities-sync sync --help
+
+Sync a directory to neocities
+
+Usage: neocities-sync sync [OPTIONS] [PATH]
+
+Arguments:
+  [PATH]  The directory to sync [default: .]
+
+Options:
+  -s, --state <STATE>                 Path to the state file. Used to keep track of the last sync
+  -i, --ignore-disallowed-file-types  Use this if you are NOT a supporter
+  -h, --help                          Print help
 ```
 
 ### Deploy a Vite/Astro/Next.js app to neocities
@@ -47,34 +66,18 @@ Options:
 Run your build command. Given that your build output is in the `dist` directory,
 we can use `neocities-sync` to upload the files to neocities.
 
-```bash
-neocities-sync --username foo --password bar --path dist --ignore-disallowed-file-types --state .state
+First login using the `neocities-sync login` command. It will prompt you for your
+username and password (Will not be displayed in the terminal)
+
+```
+❯ neocities-sync dist --ignore-disallowed-file-types --state .state
 ```
 
 Here, we use `--state .state` to store the state outside the `dist` directory because
 it will be emptied on every build.
 
-Now, every time you make changes to your app, re-run the build command and then
-run `neocities-sync`. It will only upload the files that have been modified.
-
-## User Interface
-
-The shell script `neocities-sync.sh` provides a basic user interface using
-zenity.
-
-```bash
-./neocities-sync.sh
-```
-
-![Username and password dialog.](/assets/screenshot.png)
-
-## Development
-
-```bash
-git clone https://github.com/aspizu/neocities-sync
-cd neocities-sync
-bun run src/index.ts
-```
+Now, every time you make changes to your app, re-run the build command and then run the
+`neocities-sync` command. It will only upload the files that have been modified.
 
 ## Contributing
 

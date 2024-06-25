@@ -1,7 +1,0 @@
-{
-	"bracketSpacing": false,
-	"experimentalTernaries": true,
-	"printWidth": 88,
-	"semi": false,
-	"useTabs": true
-}
