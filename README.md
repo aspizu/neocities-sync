@@ -1,7 +1,5 @@
 # `neocities-sync`
 
-[Download neocities-sync.exe](https://cdn.discordapp.com/attachments/957045238428467230/1318736064373854238/neocities-sync.exe)
-
 Sync files to [neocities](https://neocities.org/) while doing the least amount of
 [API](https://neocities.org/api) requests.
 
