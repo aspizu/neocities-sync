@@ -23,7 +23,7 @@ cargo install neocities-sync
 
 ## Usage
 
-```sh
+```
 ❯ neocities-sync --help
 
 |\---/|
@@ -45,7 +45,7 @@ Options:
   -V, --version  Print version
 ```
 
-```sh
+```
 ❯ neocities-sync sync --help
 
 Sync a directory to neocities
