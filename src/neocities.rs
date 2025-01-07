@@ -95,7 +95,7 @@ impl Neocities {
                 "Authorization",
                 format!(
                     "Basic {}",
-                    BASE64_STANDARD.encode(&format!("{}:{}", username, password))
+                    BASE64_STANDARD.encode(format!("{}:{}", username, password))
                 ),
             )
             .send()

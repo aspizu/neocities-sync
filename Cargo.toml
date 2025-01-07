@@ -1,6 +1,6 @@
 [package]
 name = "neocities-sync"
-version = "1.0.0"
+version = "1.0.1"
 description = "Sync files to neocities while doing the least amount of API requests."
 license = "MIT"
 documentation = "https://github.com/aspizu/neocities-sync"
@@ -13,6 +13,7 @@ anyhow = "1.0.86"
 base64 = "0.22.1"
 clap = { version = "4.5.7", features = ["derive"] }
 colored = "2.1.0"
+directories = "5.0.1"
 futures = "0.3.30"
 fxhash = "0.2.1"
 glob = "0.3.1"

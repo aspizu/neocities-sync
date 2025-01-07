@@ -1,3 +1,4 @@
+mod data;
 mod neocities;
 mod state;
 mod sync;
@@ -6,6 +7,7 @@ use std::{path::PathBuf, process::exit};
 
 use clap::{Parser, Subcommand};
 use colored::*;
+use data::Data;
 use neocities::Neocities;
 use sync::{sync, SyncError};
 
@@ -29,9 +31,14 @@ enum Commands {
     /// Login to neocities.
     Login,
     /// Logout from neocities.
-    Logout,
+    Logout {
+        #[arg(short, long)]
+        username: Option<String>,
+    },
     /// Sync a directory to neocities.
     Sync {
+        #[arg(short, long)]
+        username: Option<String>,
         /// The directory to sync.
         #[arg(default_value = ".")]
         path: PathBuf,
@@ -44,7 +51,25 @@ enum Commands {
     },
 }
 
-async fn login_cmd() {
+fn get_username(username: Option<String>, data: &Data) -> (String, bool) {
+    let (username, is_default) = match username {
+        Some(username) => (username, false),
+        None => match data.get_default_username() {
+            Some(username) => (username.to_string(), true),
+            None => {
+                eprintln!(
+                    "{} Use {} to login first.",
+                    "Not logged in.".bright_red(),
+                    "neocities-sync login".bright_cyan()
+                );
+                exit(1);
+            }
+        },
+    };
+    (username, is_default)
+}
+
+async fn login_cmd(mut data: Data) {
     let Ok(username) = inquire::Text::new("Enter your username:").prompt() else {
         exit(1);
     };
@@ -58,17 +83,47 @@ async fn login_cmd() {
         eprintln!("{}", "Username or password is incorrect.".bright_red());
         exit(1);
     }
-    let entry = keyring::Entry::new("neocities-sync", "default").unwrap();
+    let entry = keyring::Entry::new("neocities-sync", &username).unwrap();
     entry.set_password(&neocities.api_key.unwrap()).unwrap();
     eprintln!("{}", "Login successful.".bright_green());
+    if data.get_default_username().is_none() {
+        data.set_default_username(username);
+    }
+}
+
+async fn logout_cmd(mut data: Data, username: Option<String>) {
+    let (username, is_default) = get_username(username, &data);
+    let entry = match keyring::Entry::new("neocities-sync", &username) {
+        Ok(entry) => entry,
+        Err(keyring::Error::NoEntry) => {
+            eprintln!(
+                "{} Use {} to login first.",
+                "That username is not logged in.".bright_red(),
+                "neocities-sync login".bright_cyan()
+            );
+            if is_default {
+                data.remove_default_username();
+            }
+            exit(1);
+        }
+        Err(err) => panic!("{:#?}", err),
+    };
+    entry.delete_password().unwrap();
+    eprintln!("{}", "Logout successful.".bright_green());
+    if is_default {
+        data.remove_default_username();
+    }
 }
 
 async fn sync_cmd(
+    data: Data,
+    username: Option<String>,
     path: PathBuf,
     state: Option<PathBuf>,
     ignore_disallowed_file_types: bool,
 ) {
-    let entry = keyring::Entry::new("neocities-sync", "default").unwrap();
+    let (username, _) = get_username(username, &data);
+    let entry = keyring::Entry::new("neocities-sync", &username).unwrap();
     let api_key = match entry.get_password() {
         Ok(api_key) => api_key,
         Err(keyring::Error::NoEntry) => {
@@ -81,11 +136,7 @@ async fn sync_cmd(
         }
         Err(err) => panic!("{:#?}", err),
     };
-    let state = state.unwrap_or_else(|| {
-        let mut path = path.clone();
-        path.push(".state");
-        path
-    });
+    let state = state.unwrap_or_else(|| path.join(".state"));
     let mut neocities = Neocities::new();
     neocities.api_key = Some(api_key);
     let stats = match sync(&neocities, path, state, ignore_disallowed_file_types).await
@@ -140,15 +191,12 @@ async fn main() -> anyhow::Result<()> {
         exit(1);
     }));
     let args = Args::parse();
+    let data = Data::new();
     match args.command {
-        Commands::Login => login_cmd().await,
-        Commands::Logout => {
-            let entry = keyring::Entry::new("neocities-sync", "default").unwrap();
-            entry.delete_password().unwrap();
-            eprintln!("{}", "Logout successful.".bright_green());
-        }
-        Commands::Sync { path, state, ignore_disallowed_file_types } => {
-            sync_cmd(path, state, ignore_disallowed_file_types).await
+        Commands::Login => login_cmd(data).await,
+        Commands::Logout { username } => logout_cmd(data, username).await,
+        Commands::Sync { username, path, state, ignore_disallowed_file_types } => {
+            sync_cmd(data, username, path, state, ignore_disallowed_file_types).await
         }
     }
     Ok(())
