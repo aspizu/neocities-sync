@@ -17,13 +17,13 @@ app to neocities.
 
 ## Installation
 
-```bash
+```sh
 cargo install neocities-sync
 ```
 
 ## Usage
 
-```
+```sh
 ❯ neocities-sync --help
 
 |\---/|
@@ -45,17 +45,18 @@ Options:
   -V, --version  Print version
 ```
 
-```
+```sh
 ❯ neocities-sync sync --help
 
 Sync a directory to neocities
 
-Usage: neocities-sync sync [OPTIONS] [PATH]
+Usage: neocities-sync.exe sync [OPTIONS] [PATH]
 
 Arguments:
   [PATH]  The directory to sync [default: .]
 
 Options:
+  -u, --username <USERNAME>
   -s, --state <STATE>                 Path to the state file. Used to keep track of the last sync
   -i, --ignore-disallowed-file-types  Use this if you are NOT a supporter
   -h, --help                          Print help
@@ -69,7 +70,7 @@ we can use `neocities-sync` to upload the files to neocities.
 First login using the `neocities-sync login` command. It will prompt you for your
 username and password (Will not be displayed in the terminal)
 
-```
+```sh
 ❯ neocities-sync dist --ignore-disallowed-file-types --state .state
 ```
 
@@ -78,6 +79,21 @@ it will be emptied on every build.
 
 Now, every time you make changes to your app, re-run the build command and then run the
 `neocities-sync` command. It will only upload the files that have been modified.
+
+### Deploying to multiple accounts/sites.
+
+Login to each of the accounts using `neocities-sync login`. The first account you log
+into is the default. Select a different account using the `--username` parameter, if
+not provided - the default account is selected.
+
+For example, to sync to the account with username `aspizu`:
+
+```sh
+❯ neocities-sync --username aspizu dist --ignore-disallowed-file-types --state .state
+```
+
+You can log out of any account using `logout`, use the `--username` parameter to choose
+which account to log out.
 
 ## Contributing
 
