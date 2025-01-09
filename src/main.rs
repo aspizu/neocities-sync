@@ -3,7 +3,7 @@ mod neocities;
 mod state;
 mod sync;
 
-use std::{path::PathBuf, process::exit};
+use std::{env, path::PathBuf, process::exit};
 
 use clap::{Parser, Subcommand};
 use colored::*;
@@ -122,20 +122,22 @@ async fn sync_cmd(
     state: Option<PathBuf>,
     ignore_disallowed_file_types: bool,
 ) {
-    let (username, _) = get_username(username, &data);
-    let entry = keyring::Entry::new("neocities-sync", &username).unwrap();
-    let api_key = match entry.get_password() {
-        Ok(api_key) => api_key,
-        Err(keyring::Error::NoEntry) => {
-            eprintln!(
-                "{} Use {} to login first.",
-                "Not logged in.".bright_red(),
-                "neocities-sync login".bright_cyan()
-            );
-            exit(1);
+    let api_key = env::var("NEOCITIES_API_KEY").unwrap_or_else(|_| {
+        let (username, _) = get_username(username, &data);
+        let entry = keyring::Entry::new("neocities-sync", &username).unwrap();
+        match entry.get_password() {
+            Ok(api_key) => api_key,
+            Err(keyring::Error::NoEntry) => {
+                eprintln!(
+                    "{} Use {} to login first.",
+                    "Not logged in.".bright_red(),
+                    "neocities-sync login".bright_cyan()
+                );
+                exit(1);
+            }
+            Err(err) => panic!("{:#?}", err),
         }
-        Err(err) => panic!("{:#?}", err),
-    };
+    });
     let state = state.unwrap_or_else(|| path.join(".state"));
     let mut neocities = Neocities::new();
     neocities.api_key = Some(api_key);

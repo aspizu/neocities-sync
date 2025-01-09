@@ -95,6 +95,11 @@ For example, to sync to the account with username `aspizu`:
 You can log out of any account using `logout`, use the `--username` parameter to choose
 which account to log out.
 
+### Read the API KEY from an environment variable
+
+You can set the `NEOCITIES_API_KEY` environment variable to your API key. `--username`
+will be ignored if the `NEOCITIES_API_KEY` environment variable is set.
+
 ## Contributing
 
 Pull requests are welcome.
