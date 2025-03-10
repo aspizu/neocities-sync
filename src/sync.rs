@@ -6,9 +6,9 @@ use std::{
 
 use futures::{future::try_join_all, TryFutureExt};
 use fxhash::FxHashMap;
-use glob::glob;
 use sha1::{Digest, Sha1};
 use tokio::{fs, try_join};
+use walkdir::WalkDir;
 
 use crate::{
     neocities::{DeleteError, ListError, Neocities, UploadError},
@@ -87,9 +87,6 @@ async fn process(
     if state_path_relative_to_path.as_deref().is_some_and(|it| it == subpath) {
         return Ok(());
     }
-    if subpath.is_dir() {
-        return Ok(());
-    }
     let file = fs::read(&subpath).await?;
     let subpath = pathdiff::diff_paths(&subpath, path.as_ref()).unwrap();
     let mut hasher = Sha1::new();
@@ -125,15 +122,18 @@ pub async fn sync(
     let new_state: RefCell<FxHashMap<String, String>> = Default::default();
     let state_path_relative_to_path = pathdiff::diff_paths(&state_path, &path);
     let to_be_uploaded: RefCell<Vec<(String, Vec<u8>)>> = Default::default();
-    let paths = glob(path.as_ref().join("**/*").to_str().unwrap()).unwrap();
     let mut futs = vec![];
-    for subpath in paths {
-        let subpath = subpath.map_err(|err| err.into_error())?;
-        if ignore_disllowed_file_types
-            && !subpath
-                .extension()
-                .is_some_and(|it| ALLOWED_FILE_TYPES.contains(&it.to_str().unwrap()))
-        {
+    for subpath in WalkDir::new(&path) {
+        let subpath = subpath.map_err(|err| err.into_io_error().unwrap())?;
+        let subpath = subpath.path().to_path_buf();
+        let is_of_allowed_file_type = subpath
+            .extension()
+            .is_some_and(|it| ALLOWED_FILE_TYPES.contains(&it.to_str().unwrap()));
+        if subpath.is_dir() {
+            continue;
+        }
+        if ignore_disllowed_file_types && !is_of_allowed_file_type {
+            eprintln!("[ignored] {}", subpath.display());
             continue;
         }
         futs.push(process(
